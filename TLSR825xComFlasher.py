@@ -131,6 +131,7 @@ def rd_sws_fifo_wr_usbcom(serialPort, addr, data):
 def sws_read_data(serialPort, addr, size = 1):
 	time.sleep(0.05)
 	serialPort.reset_input_buffer()
+	serialPort.read(1024)
 	# send addr and flag read
 	rd_wr_usbcom_blk(serialPort, sws_rd_addr(addr))
 	out = []
@@ -285,14 +286,17 @@ def activate(serialPort, tact_ms):
 			for i in range(5):
 				wr_usbcom_blk(serialPort, blk)
 			serialPort.reset_input_buffer()
+			serialPort.read(1024*8)
 	#--------------------------------
 	# Duplication with syncronization
 	time.sleep(0.01)
 	serialPort.reset_input_buffer()
+	serialPort.read(1024*4)
 	rd_wr_usbcom_blk(serialPort, sws_code_end())
 	rd_wr_usbcom_blk(serialPort, blk)
 	time.sleep(0.01)
 	serialPort.reset_input_buffer()
+	serialPort.read(1024*8)
 
 def FlashReadBlock(serialPort, stream, offset = 0, size = 0x80000):
 	offset &= 0x00ffffff
@@ -497,6 +501,7 @@ def main():
 		serialPort = serial.Serial(args.port,args.baud)
 		serialPort.reset_input_buffer()
 		serialPort.timeout = 0.1
+		serialPort.read(1024*4)
 	except:
 		print ('Error: Open %s, %d baud!' % (args.port, args.baud))
 		sys.exit(1)
